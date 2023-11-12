@@ -1,0 +1,72 @@
+type Query {
+    contentItems: [ContentItem!]
+    supplementaryContentItems: [SupplementaryContentItem!]
+    articles: [Article!]
+    products: [Product!]
+}
+
+type ContentItem {
+    id: ID!
+    text: String!
+    imageUrl: String!
+    imageDescription: String!
+}
+
+type SupplementaryContentItem {
+    id: ID!
+    text: String!
+    imageUrl: String!
+    imageDescription: String!
+}
+
+type Article {
+    href: String!
+    title: String!
+}
+
+type Product {
+    title: String!
+    imageUrl: String!
+    description: String!
+    types: [String!]
+    volumes: [String!]
+}
+
+input ArticleInput {
+    href: String!
+    title: String!
+}
+
+input ContentItemInput {
+    text: String!
+    imageUrl: String!
+    imageDescription: String!
+}
+
+input SupplementaryContentItemInput {
+    text: String!
+    imageUrl: String!
+    imageDescription: String!
+}
+
+input ProductInput {
+    title: String!
+    imageUrl: String!
+    description: String!
+    types: [String!]
+    volumes: [String!]
+}
+
+type DeleteResult {
+    message: String!
+}
+
+type Mutation {
+    addArticle(article: ArticleInput): Article
+    addContentItem(contentItem: ContentItemInput): ContentItem
+    addSupplementaryContentItem(supplementaryContentItem: SupplementaryContentItemInput): SupplementaryContentItem
+    addProduct(product: ProductInput): Product
+    deleteContentItem(id: Int!): DeleteResult
+    deleteSupplementaryContentItem(id: Int!): DeleteResult
+    deleteArticle(id: Int!): DeleteResult
+}
