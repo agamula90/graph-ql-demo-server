@@ -1,10 +1,9 @@
 package com.underlake.honey.controller;
 
-import com.underlake.honey.dao.ContentEntity;
-import com.underlake.honey.dao.ProductEntity;
-import com.underlake.honey.dto.Product;
-import com.underlake.honey.dto.SupplementaryItem;
-import com.underlake.honey.repository.ProductRepository;
+import com.underlake.honey.domain.DeleteResult;
+import com.underlake.honey.domain.Product;
+import com.underlake.honey.service.ProductService;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -14,22 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class ProductController {
+class ProductController {
 
-    private ProductRepository repository;
+    private final ProductService productService;
 
-    public ProductController(ProductRepository repository) {
-        this.repository = repository;
+    ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @QueryMapping
-    public List<Product> products() {
-        return repository.findProducts();
+    List<Product> products() {
+        return productService.findProducts();
     }
 
     @MutationMapping
     Product addProduct(@Arguments Map<String, Object> product) {
-        ProductEntity entity = repository.save(ProductEntity.fromGraphQLInput(product));
-        return new Product(entity);
+        return productService.addProduct(productService.productFromGraphQLInput(product));
+    }
+
+    @MutationMapping
+    DeleteResult deleteProduct(@Argument int id) {
+        boolean isDeleteSucceeded = productService.deleteProductById(id);
+        return isDeleteSucceeded ? DeleteResult.ok() : DeleteResult.fail();
     }
 }

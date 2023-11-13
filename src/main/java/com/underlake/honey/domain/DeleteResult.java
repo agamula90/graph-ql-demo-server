@@ -1,4 +1,4 @@
-package com.underlake.honey.dto;
+package com.underlake.honey.domain;
 
 public record DeleteResult(String message) {
 

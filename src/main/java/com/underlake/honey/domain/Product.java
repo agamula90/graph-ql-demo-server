@@ -1,6 +1,5 @@
-package com.underlake.honey.dto;
+package com.underlake.honey.domain;
 
-import com.underlake.honey.dao.ProductEntity;
 import com.underlake.honey.utils.ValidationUtils;
 import org.apache.logging.log4j.util.Strings;
 
@@ -15,24 +14,13 @@ public class Product {
     public final List<String> types;
     public final List<String> volumes;
 
-    public Product(ProductEntity entity) {
-        this(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getImageUrl(),
-                entity.getDescription(),
-                entity.getTypes(),
-                entity.getVolumes()
-        );
-    }
-
-    Product(
-            int id,
-            String title,
-            String imageUrl,
-            String description,
-            List<String> types,
-            List<String> volumes
+    public Product(
+        int id,
+        String title,
+        String imageUrl,
+        String description,
+        List<String> types,
+        List<String> volumes
     ) {
         ValidationUtils.requireTextNotEmpty(title);
         Objects.requireNonNull(imageUrl, "Image url not supplied");

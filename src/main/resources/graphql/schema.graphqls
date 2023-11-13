@@ -69,4 +69,5 @@ type Mutation {
     deleteContentItem(id: Int!): DeleteResult
     deleteSupplementaryContentItem(id: Int!): DeleteResult
     deleteArticle(id: Int!): DeleteResult
+    deleteProduct(id: Int!): DeleteResult
 }

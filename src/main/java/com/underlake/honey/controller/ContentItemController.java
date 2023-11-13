@@ -1,9 +1,8 @@
 package com.underlake.honey.controller;
 
-import com.underlake.honey.dao.ContentEntity;
-import com.underlake.honey.dto.ContentItem;
-import com.underlake.honey.dto.DeleteResult;
-import com.underlake.honey.repository.ContentItemRepository;
+import com.underlake.honey.domain.ContentItem;
+import com.underlake.honey.domain.DeleteResult;
+import com.underlake.honey.service.ContentItemService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -14,32 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class ContentItemController {
+class ContentItemController {
 
-    private final ContentItemRepository repository;
+    private final ContentItemService contentItemService;
 
-    public ContentItemController(ContentItemRepository repository) {
-        this.repository = repository;
+    ContentItemController(ContentItemService contentItemService) {
+        this.contentItemService = contentItemService;
     }
 
     @QueryMapping
-    public List<ContentItem> contentItems() {
-        return repository.findContentItems();
+    List<ContentItem> contentItems() {
+        return contentItemService.findContentItems();
     }
 
     @MutationMapping
-    ContentItem addContentItem(@Arguments Map<String, Object> article) {
-        ContentEntity entity = repository.save(ContentEntity.contentItemFromGraphQLInput(article));
-        return new ContentItem(entity);
+    ContentItem addContentItem(@Arguments Map<String, Object> contentItem) {
+        return contentItemService.addContentItem(contentItemService.contentItemFromGraphQLInput(contentItem));
     }
 
     @MutationMapping
     DeleteResult deleteContentItem(@Argument int id) {
-        try {
-            repository.deleteById(id);
-            return DeleteResult.ok();
-        } catch (Exception e) {
-            return DeleteResult.fail();
-        }
+        boolean isDeleteSucceeded = contentItemService.deleteContentItemById(id);
+        return isDeleteSucceeded ? DeleteResult.ok() : DeleteResult.fail();
     }
 }

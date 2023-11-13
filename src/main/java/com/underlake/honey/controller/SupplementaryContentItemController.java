@@ -1,9 +1,8 @@
 package com.underlake.honey.controller;
 
-import com.underlake.honey.dao.ContentEntity;
-import com.underlake.honey.dto.DeleteResult;
-import com.underlake.honey.dto.SupplementaryItem;
-import com.underlake.honey.repository.ContentItemRepository;
+import com.underlake.honey.domain.DeleteResult;
+import com.underlake.honey.domain.SupplementaryContentItem;
+import com.underlake.honey.service.ContentItemService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -14,32 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class SupplementaryContentItemController {
+class SupplementaryContentItemController {
 
-    private final ContentItemRepository repository;
+    private final ContentItemService contentItemService;
 
-    public SupplementaryContentItemController(ContentItemRepository repository) {
-        this.repository = repository;
+    SupplementaryContentItemController(ContentItemService contentItemService) {
+        this.contentItemService = contentItemService;
     }
 
     @QueryMapping
-    public List<SupplementaryItem> supplementaryContentItems() {
-        return repository.findSupplementaryContentItems();
+    List<SupplementaryContentItem> supplementaryContentItems() {
+        return contentItemService.findSupplementaryContentItems();
     }
 
     @MutationMapping
-    SupplementaryItem addSupplementaryContentItem(@Arguments Map<String, Object> article) {
-        ContentEntity entity = repository.save(ContentEntity.supplementaryContentItemFromGraphQLInput(article));
-        return new SupplementaryItem(entity);
+    SupplementaryContentItem addSupplementaryContentItem(@Arguments Map<String, Object> article) {
+        return contentItemService.addSupplementaryContentItem(contentItemService.supplementaryContentItemFromGraphQLInput(article));
     }
 
     @MutationMapping
     DeleteResult deleteSupplementaryContentItem(@Argument int id) {
-        try {
-            repository.deleteById(id);
-            return DeleteResult.ok();
-        } catch (Exception e) {
-            return DeleteResult.fail();
-        }
+        boolean isDeleteSucceeded = contentItemService.deleteContentItemById(id);
+        return isDeleteSucceeded ? DeleteResult.ok() : DeleteResult.fail();
     }
 }

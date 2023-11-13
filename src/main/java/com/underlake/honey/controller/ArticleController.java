@@ -1,9 +1,8 @@
 package com.underlake.honey.controller;
 
-import com.underlake.honey.dao.ArticleEntity;
-import com.underlake.honey.dto.Article;
-import com.underlake.honey.dto.DeleteResult;
-import com.underlake.honey.repository.ArticleRepository;
+import com.underlake.honey.domain.Article;
+import com.underlake.honey.domain.DeleteResult;
+import com.underlake.honey.service.ArticleService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -14,32 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class ArticleController {
+class ArticleController {
 
-    private final ArticleRepository repository;
+    private final ArticleService articleService;
 
-    ArticleController(ArticleRepository repository) {
-        this.repository = repository;
+    ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
     }
 
     @QueryMapping
     List<Article> articles() {
-        return repository.findAllDto();
+        return articleService.findAllArticles();
     }
 
     @MutationMapping
     Article addArticle(@Arguments Map<String, Object> article) {
-        ArticleEntity entity = repository.save(ArticleEntity.fromGraphQLInput(article));
-        return new Article(entity);
+        return articleService.addArticle(articleService.articleFromGraphQLInput(article));
     }
 
     @MutationMapping
     DeleteResult deleteArticle(@Argument int id) {
-        try {
-            repository.deleteById(id);
-            return DeleteResult.ok();
-        } catch (Exception e) {
-            return DeleteResult.fail();
-        }
+        boolean isDeleteSucceeded = articleService.deleteArticleById(id);
+        return isDeleteSucceeded ? DeleteResult.ok() : DeleteResult.fail();
     }
 }
