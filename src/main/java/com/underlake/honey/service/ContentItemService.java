@@ -15,9 +15,14 @@ import java.util.stream.Collectors;
 public class ContentItemService {
 
     private final ContentItemRepository contentItemRepository;
+    private final ImageService imageService;
 
-    public ContentItemService(ContentItemRepository contentItemRepository) {
+    public ContentItemService(
+        ContentItemRepository contentItemRepository,
+        ImageService imageService
+    ) {
         this.contentItemRepository = contentItemRepository;
+        this.imageService = imageService;
     }
 
     public List<ContentItem> findContentItems() {
@@ -31,17 +36,27 @@ public class ContentItemService {
     }
 
     private ContentItem contentItemFromEntity(ContentEntity entity) {
-        return new ContentItem(entity.getId(), entity.getText(), entity.getImageUrl(), entity.getImageDescription());
+        return new ContentItem(
+            entity.getId(),
+            entity.getText(),
+            imageService.getAssetPublicPath(entity.getImageUrl()),
+            entity.getImageDescription()
+        );
     }
 
     private SupplementaryContentItem supplementaryContentItemFromEntity(ContentEntity entity) {
-        return new SupplementaryContentItem(entity.getId(), entity.getText(), entity.getImageUrl(), entity.getImageDescription());
+        return new SupplementaryContentItem(
+            entity.getId(),
+            entity.getText(),
+            imageService.getAssetPublicPath(entity.getImageUrl()),
+            entity.getImageDescription()
+        );
     }
 
     private ContentEntity entityFromContentItem(ContentItem contentItem) {
         ContentEntity entity = new ContentEntity();
         entity.setText(contentItem.text());
-        entity.setImageUrl(contentItem.imageUrl());
+        entity.setImageUrl(imageService.getAssetNameByPublicPath(contentItem.imageUrl()));
         entity.setImageDescription(contentItem.imageDescription());
         entity.setSupplementary(false);
         return entity;
@@ -50,7 +65,7 @@ public class ContentItemService {
     private ContentEntity entityFromSupplementaryContentItem(SupplementaryContentItem contentItem) {
         ContentEntity entity = new ContentEntity();
         entity.setText(contentItem.text());
-        entity.setImageUrl(contentItem.imageUrl());
+        entity.setImageUrl(imageService.getAssetNameByPublicPath(contentItem.imageUrl()));
         entity.setImageDescription(contentItem.imageDescription());
         entity.setSupplementary(true);
         return entity;
@@ -81,7 +96,7 @@ public class ContentItemService {
         }
         entity.setText(text.toString());
         entity.setImageDescription(imageDescription.toString());
-        entity.setImageUrl(imageUrl.toString());
+        entity.setImageUrl(imageService.getAssetNameByPublicPath(imageUrl.toString()));
         return entity;
     }
 

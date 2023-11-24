@@ -25,6 +25,7 @@ type Article {
 }
 
 type Product {
+    id: Int!
     title: String!
     imageUrl: String!
     description: String!

@@ -14,9 +14,14 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ImageService imageService;
 
-    ProductService(ProductRepository productRepository) {
+    ProductService(
+        ProductRepository productRepository,
+        ImageService imageService
+    ) {
         this.productRepository = productRepository;
+        this.imageService = imageService;
     }
 
     public List<Product> findProducts() {
@@ -27,7 +32,7 @@ public class ProductService {
         return new Product(
             entity.getId(),
             entity.getTitle(),
-            entity.getImageUrl(),
+            imageService.getAssetPublicPath(entity.getImageUrl()),
             entity.getDescription(),
             entity.getTypes(),
             entity.getVolumes()
@@ -53,7 +58,7 @@ public class ProductService {
         }
         entity.setTitle(title.toString());
         entity.setDescription(description.toString());
-        entity.setImageUrl(imageUrl.toString());
+        entity.setImageUrl(imageService.getAssetNameByPublicPath(imageUrl.toString()));
         entity.setTypes(types);
         entity.setVolumes(volumes);
         return productFromEntity(entity);
@@ -63,7 +68,7 @@ public class ProductService {
         ProductEntity entity = new ProductEntity();
         entity.setTitle(product.title);
         entity.setDescription(product.description);
-        entity.setImageUrl(product.imageUrl);
+        entity.setImageUrl(imageService.getAssetNameByPublicPath(product.imageUrl));
         entity.setVolumes(product.volumes);
         entity.setTypes(product.types);
         return entity;
